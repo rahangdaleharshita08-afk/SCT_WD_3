@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Strike - Ultimate Tic Tac Toe</title>
+    <!-- Google Fonts: Orbitron for cyberpunk/gaming feel, Inter for sleek UI readability -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Background grid decoration -->
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <!-- Canvas for winning particles/confetti -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <div class="app-container">
+        <!-- Main Game Header -->
+        <header>
+            <div class="logo-container">
+                <span class="logo-text">NEON</span>
+                <span class="logo-subtext">STRIKE</span>
+            </div>
+            <div class="header-controls">
+                <button id="sound-toggle" class="icon-btn" title="Toggle Sound" aria-label="Toggle Sound">
+                    <svg id="sound-on-icon" viewBox="0 0 24 24" width="24" height="24">
+                        <path fill="currentColor" d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.85 14,18.71V20.77C18.01,19.86 21,16.28 21,12C21,7.72 18.01,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16C15.5,15.29 16.5,13.77 16.5,12M3,9V15H7L12,20V4L7,9H3Z"/>
+                    </svg>
+                    <svg id="sound-off-icon" class="hidden" viewBox="0 0 24 24" width="24" height="24">
+                        <path fill="currentColor" d="M12,4L9.91,6.09L12,8.18M4.27,3L3,4.27L7.73,9H3V15H7L12,20V13.27L16.25,17.53C15.58,18.04 14.83,18.46 14,18.7V20.77C15.38,20.44 16.63,19.79 17.66,18.95L20.27,21.56L21.54,20.29L16.63,15.38L12,10.75M19,12C19,12.78 18.87,13.5 18.64,14.2L20.2,15.76C20.72,14.61 21,13.34 21,12C21,7.72 18.01,4.14 14,3.23V5.29C16.89,6.15 19,8.83 19,12M16.5,12A4.5,4.5 0 0,0 14,7.97V10.18L16.45,12.63C16.48,12.43 16.5,12.22 16.5,12Z"/>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- SETUP SCREEN -->
+        <main id="setup-screen" class="glass-card fade-in">
+            <h2 class="section-title">CHOOSE GAME MODE</h2>
+            
+            <!-- Mode Buttons -->
+            <div class="mode-selector">
+                <button id="mode-pvc" class="mode-btn active">
+                    <span class="mode-icon">🤖</span>
+                    <span class="mode-label">vs Computer</span>
+                </button>
+                <button id="mode-pvp" class="mode-btn">
+                    <span class="mode-icon">👥</span>
+                    <span class="mode-label">vs Friend</span>
+                </button>
+            </div>
+
+            <!-- AI Difficulty Selection (Hidden when PVP is selected) -->
+            <div id="ai-difficulty-container" class="difficulty-section">
+                <h3 class="setup-subtitle">AI DIFFICULTY</h3>
+                <div class="difficulty-selector">
+                    <button class="diff-btn" data-diff="easy">EASY</button>
+                    <button class="diff-btn active" data-diff="medium">MEDIUM</button>
+                    <button class="diff-btn" data-diff="hard">HARD</button>
+                </div>
+            </div>
+
+            <!-- Player Configuration -->
+            <div class="players-config">
+                <!-- Player 1 Config -->
+                <div class="player-setup-card" id="p1-setup">
+                    <div class="avatar-glow" style="--p-color: #00f3ff">X</div>
+                    <h3 class="setup-subtitle">PLAYER 1</h3>
+                    <input type="text" id="p1-name" class="neon-input" value="Player 1" maxlength="12" placeholder="Enter Name">
+                    
+                    <div class="color-picker-group">
+                        <span class="picker-label">Color:</span>
+                        <div class="color-options">
+                            <button class="color-dot active" data-color="#00f3ff" style="background-color: #00f3ff;"></button>
+                            <button class="color-dot" data-color="#39ff14" style="background-color: #39ff14;"></button>
+                            <button class="color-dot" data-color="#ff9900" style="background-color: #ff9900;"></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Player 2 / CPU Config -->
+                <div class="player-setup-card" id="p2-setup">
+                    <div class="avatar-glow" style="--p-color: #ff007f">O</div>
+                    <h3 id="p2-setup-title" class="setup-subtitle">COMPUTER</h3>
+                    <input type="text" id="p2-name" class="neon-input" value="HAL 9000" maxlength="12" placeholder="Enter Name">
+                    
+                    <div class="color-picker-group">
+                        <span class="picker-label">Color:</span>
+                        <div class="color-options">
+                            <button class="color-dot active" data-color="#ff007f" style="background-color: #ff007f;"></button>
+                            <button class="color-dot" data-color="#9d00ff" style="background-color: #9d00ff;"></button>
+                            <button class="color-dot" data-color="#ff0022" style="background-color: #ff0022;"></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Start Button -->
+            <button id="start-game-btn" class="neon-btn primary-neon-btn">
+                <span>START MATCH</span>
+            </button>
+        </main>
+
+        <!-- GAMEPLAY SCREEN (Initially Hidden) -->
+        <main id="game-screen" class="hidden">
+            <!-- Scoreboard -->
+            <section class="scoreboard">
+                <!-- Player 1 Score -->
+                <div class="score-card" id="score-p1" style="--p-color: #00f3ff">
+                    <span class="score-player-name">Player 1</span>
+                    <span class="score-marker">X</span>
+                    <span class="score-value" id="score-p1-value">0</span>
+                    <div class="active-indicator"></div>
+                </div>
+
+                <!-- Tie Score -->
+                <div class="score-card tie-card">
+                    <span class="score-player-name">Ties</span>
+                    <span class="score-marker">=</span>
+                    <span class="score-value" id="score-tie-value">0</span>
+                </div>
+
+                <!-- Player 2 Score -->
+                <div class="score-card" id="score-p2" style="--p-color: #ff007f">
+                    <span class="score-player-name">HAL 9000</span>
+                    <span class="score-marker">O</span>
+                    <span class="score-value" id="score-p2-value">0</span>
+                    <div class="active-indicator"></div>
+                </div>
+            </section>
+
+            <!-- Status Indicator Panel -->
+            <div id="status-panel" class="status-panel glass-card">
+                <span id="status-text">PLAYER 1'S TURN</span>
+            </div>
+
+            <!-- Game Board Wrapper -->
+            <div class="board-outer-container">
+                <div class="board" id="game-board">
+                    <div class="cell" data-index="0"></div>
+                    <div class="cell" data-index="1"></div>
+                    <div class="cell" data-index="2"></div>
+                    <div class="cell" data-index="3"></div>
+                    <div class="cell" data-index="4"></div>
+                    <div class="cell" data-index="5"></div>
+                    <div class="cell" data-index="6"></div>
+                    <div class="cell" data-index="7"></div>
+                    <div class="cell" data-index="8"></div>
+                </div>
+            </div>
+
+            <!-- In-game Controls -->
+            <div class="game-controls">
+                <button id="reset-btn" class="neon-btn secondary-neon-btn">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                        <path d="M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z"/>
+                    </svg>
+                    <span>Reset Board</span>
+                </button>
+                <button id="change-settings-btn" class="neon-btn secondary-neon-btn">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                        <path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.47,5.34 14.86,5.08L14.47,2.42C14.43,2.18 14.22,2 13.97,2H9.97C9.72,2 9.51,2.18 9.47,2.42L9.08,5.08C8.47,5.34 7.9,5.66 7.38,6.05L4.89,5.05C4.67,4.96 4.4,5.05 4.28,5.27L2.28,8.73C2.16,8.95 2.21,9.22 2.4,9.37L4.51,11C4.47,11.34 4.45,11.67 4.45,12C4.45,12.33 4.47,12.65 4.51,12.97L2.4,14.63C2.21,14.78 2.16,15.05 2.28,15.27L4.28,18.73C4.4,18.95 4.67,19.04 4.89,18.95L7.38,17.95C7.9,18.34 8.47,18.66 9.08,18.92L9.47,21.58C9.51,21.82 9.72,22 9.97,22H13.97C14.22,22 14.43,21.82 14.47,21.58L14.86,18.92C15.47,18.66 16.04,18.34 16.56,17.95L19.05,18.95C19.27,19.04 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"/>
+                    </svg>
+                    <span>Match Options</span>
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Script Entrypoint -->
+    <script src="script.js"></script>
+</body>
+</html>
